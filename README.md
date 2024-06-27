@@ -23,7 +23,8 @@ composer require playtini/geoip
 
 ## Usage
 
-Usage:
+See `examples/*.php`.
+
 
 ```php
 use Playtini\GeoIp\GeoIp;
@@ -85,6 +86,8 @@ echo $geoIp->ip2LocationProxyType('8.8.8.8') . "\n"; // DCH
 
 If your GeoIP files aren't named by default or aren't in the dir `/usr/share/GeoIP/` then pass arguments to constructors.
 
+### Priority
+
 IP2Location database has priority for methods `country`, `city`:
 * country - if IP2Location data is not empty - don't look up MaxMind
 * city - if IP2Location country differs from MaxMind - use IP2Location country and empty city
@@ -105,16 +108,15 @@ echo $geoIp->country('80.231.192.1', ['CA', 'AU']) . "\n"; // CA
 // MaxMind country is among preferred countries; it is used instead of different IP2Location country
 ```
 
-See `examples/*.php`.
-
-
 Symfony
 -------
 
 Add to `config/services.yaml`
 
-    imports:
-        - { resource: '../vendor/playtini/geoip/config/config.yaml' }
+```yaml
+imports:
+    - { resource: '../vendor/playtini/geoip/config/config.yaml' }
+```
 
 You can copy config to your .yaml-files without import and tune for your needs.
 

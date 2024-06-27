@@ -10,11 +10,11 @@ services:
 
     Playtini\GeoIp\MaxMindGeoIp:
         public: true
-        arguments: [ '%env(string:GEOIP_DIR)%' ]
+        arguments: [ '%env(resolve:GEOIP_DIR)%' ]
 
     Playtini\GeoIp\Ip2LocationGeoIp:
         public: true
-        arguments: [ '%env(string:GEOIP_DIR)%' ]
+        arguments: [ '%env(resolve:GEOIP_DIR)%' ]
 
     Playtini\GeoIp\Twig\GeoIpExtension:
         public: true

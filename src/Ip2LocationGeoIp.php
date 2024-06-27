@@ -9,7 +9,7 @@ class Ip2LocationGeoIp
 {
     public function __construct(
         private readonly string $baseDir = '/usr/share/GeoIP/',
-        private readonly string $ip2locationCountryFilename = 'IP-COUNTRY.BIN',
+        private readonly string $ip2locationCountryFilename = 'IPV6-COUNTRY.BIN',
         private readonly string $ip2locationProxyTypeFilename = 'IP2PROXY-IP-PROXYTYPE-COUNTRY.BIN',
     )
     {
@@ -46,7 +46,9 @@ class Ip2LocationGeoIp
 
         $records = $db->lookup($ip, Database::ALL);
 
-        return $records['countryCode'] ?? '';
+        $result = $records['countryCode'] ?? '';
+
+        return ($result !== '-') ? $result : '';
     }
 
 

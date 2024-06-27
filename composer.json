@@ -1,0 +1,28 @@
+{
+    "name": "playtini/geoip",
+    "type": "library",
+    "description": "Simple GeoIP Client for MaxMind and IP2Location Databases",
+    "keywords": ["geoip", "maxmind", "ip2location", "geoip2", "client", "playtini", "country", "city", "proxy"],
+    "license": "GPL-3.0-only",
+    "require": {
+        "php": "^8.1",
+        "symfony/http-client": "^6.0|^7.0",
+        "symfony/http-foundation": "^6.0|^7.0",
+        "geoip2/geoip2": "^3.0",
+        "ip2location/ip2location-php": "^9.7"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5",
+        "phpspec/prophecy-phpunit": "^2.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Playtini\\GeoIp\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Playtini\\GeoIp\\Tests\\": "tests/"
+        }
+    }
+}

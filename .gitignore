@@ -1,0 +1,5 @@
+/.idea/
+/data/geoip/
+/vendor/
+.phpunit.result.cache
+composer.lock

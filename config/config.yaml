@@ -4,14 +4,17 @@ parameters:
 services:
     Playtini\GeoIp\GeoIp:
         public: true
+        arguments:
+            - '@Playtini\GeoIp\MaxMindGeoIp'
+            - '@Playtini\GeoIp\Ip2LocationGeoIp'
 
     Playtini\GeoIp\MaxMindGeoIp:
         public: true
-        arguments: [ '%env(resolve:GEOIP_DIR)%' ]
+        arguments: [ '%env(string:GEOIP_DIR)%' ]
 
     Playtini\GeoIp\Ip2LocationGeoIp:
         public: true
-        arguments: [ '%env(resolve:GEOIP_DIR)%' ]
+        arguments: [ '%env(string:GEOIP_DIR)%' ]
 
     Playtini\GeoIp\Twig\GeoIpExtension:
         public: true

@@ -116,8 +116,9 @@ Add to `config/services.yaml`
     imports:
         - { resource: '../vendor/playtini/geoip/config/config.yaml' }
 
-You can copy config to your .yaml-files without import and tune for your needs
+You can copy config to your .yaml-files without import and tune for your needs.
 
+Add env `GEOIP_DIR` with all your GeoIP database files. Default - `%kernel.project_dir%/data/geoip`
 
 Use with autowire
 

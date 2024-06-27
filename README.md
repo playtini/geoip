@@ -85,6 +85,24 @@ echo $geoIp->ip2LocationProxyType('8.8.8.8') . "\n"; // DCH
 
 If your GeoIP files aren't named by default or aren't in the dir `/usr/share/GeoIP/` then pass arguments to constructors.
 
+IP2Location database has priority for methods `country`, `city`:
+* country - if IP2Location data is not empty - don't look up MaxMind
+* city - if IP2Location country differs from MaxMind - use IP2Location country and empty city
+
+If you have guesses which countries may IP be from then you can pass the second argument `array $preferredCountries`.
+Then even if IP2Location country differs from MaxMind but MaxMind returns country from preferred then MaxMind country will be used.
+
 ```php
-80.231.192.1
+echo $geoIp->maxMindCountry('80.231.192.1') . "\n"; // CA
+echo $geoIp->ip2LocationCountry('80.231.192.1') . "\n"; // DZ
+
+echo $geoIp->country('80.231.192.1') . "\n"; // DZ - IP2Location has higher priority
+
+echo $geoIp->country('80.231.192.1', ['BR', 'MX']) . "\n"; // DZ
+// IP2Location still has higher priority, MaxMind country is not among preferred countries
+
+echo $geoIp->country('80.231.192.1', ['CA', 'AU']) . "\n"; // CA
+// MaxMind country is among preferred countries; it is used instead of different IP2Location country
 ```
+
+See `examples/*.php`.

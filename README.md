@@ -106,3 +106,38 @@ echo $geoIp->country('80.231.192.1', ['CA', 'AU']) . "\n"; // CA
 ```
 
 See `examples/*.php`.
+
+
+Symfony
+-------
+
+Add to `config/services.yaml`
+
+    imports:
+        - { resource: '../vendor/playtini/geoip/config/config.yaml' }
+
+You can copy config to your .yaml-files without import and tune for your needs
+
+
+Use with autowire
+
+    /**
+     * @Route("/test", name="test")
+     */
+    public function test(GeoIp $geoIp): Response
+    {
+        dd($geoIpParser->country('1.1.1.1'));
+    }
+
+`GeoIpExtension` is optional to add but if you added it you have Twig filters:
+
+* `domain_ip`: convert domain name or IP to IP - `'google.com'|domain_ip`, `'1.1.1.1'|domain_ip`
+* `ip_country_code`: convert IP to country code - `'1.1.1.1'|ip_country_code` - US, AU, ...
+* `ip_flag`: convert IP to HTML with flag - `'1.1.1.1'|ip_flag`
+* `country_code_flag`: convert country code to HTML with flag - `'CA'|country_code_flag`
+
+To use flags copy `public/css/flags.css` and `public/img/flags.png` to your public folder.
+
+Add to `base.html.twig` or other template:
+
+    <link rel="stylesheet" href="{{ asset('css/flags.css') }}">

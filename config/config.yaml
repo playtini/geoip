@@ -1,0 +1,19 @@
+parameters:
+    env(GEOIP_DIR): '%kernel.project_dir%/data/geoip'
+
+services:
+    Playtini\GeoIp\GeoIp:
+        public: true
+
+    Playtini\GeoIp\MaxMindGeoIp:
+        public: true
+        arguments: [ '%env(resolve:GEOIP_DIR)%' ]
+
+    Playtini\GeoIp\Ip2LocationGeoIp:
+        public: true
+        arguments: [ '%env(resolve:GEOIP_DIR)%' ]
+
+    Playtini\GeoIp\Twig\GeoIpExtension:
+        public: true
+        tags: [ 'twig.extension' ]
+        arguments: [ '@Playtini\GeoIp\GeoIp' ]

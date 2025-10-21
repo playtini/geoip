@@ -18,19 +18,17 @@ class MaxMindGeoIp
 
     public function country(?string $ip): string
     {
-        if (!$ip) {
-            return '';
+        $record = null;
+
+        if ($ip) {
+            try {
+                $db = $this->getCountryDatabase();
+                $record = $db->country($ip);
+            } catch (Throwable) {
+            }
         }
 
-        try {
-            $db = $this->getCountryDatabase();
-
-            $record = $db->country($ip);
-        } catch (Throwable) {
-            return '';
-        }
-
-        $country = $record->country->isoCode;
+        $country = $record?->country->isoCode ?? '';
 
         return ($country !== 'UN' && $country !== '-') ? $country : '';
     }

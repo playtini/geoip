@@ -12,32 +12,37 @@ class Ip2LocationGeoIp
     // Anonymizing VPN services.
     // These services offer users a publicly accessible VPN for the purpose of hiding their IP address.
     // Anonymity: High
-    public const PROXY_VPN = 'VPN';
+    public const string PROXY_VPN = 'VPN';
 
     // Tor Exit Nodes.
     // The Tor Project is an open network used by those who wish to maintain anonymity.
     // Anonymity: High
-    public const PROXY_TOR = 'TOR';
+    public const string PROXY_TOR = 'TOR';
 
     // Hosting Provider, Data Center or Content Delivery Network.
     // Since hosting providers and data centers can serve to provide anonymity, the Anonymous IP database flags IP addresses associated with them.
     // Anonymity: Low
-    public const PROXY_DCH = 'DCH';
+    public const string PROXY_DCH = 'DCH';
 
     // Public Proxies.
     // These are services which make connection requests on a user's behalf. Proxy server software can be configured by the administrator to listen on
     // some specified port. These differ from VPNs in that the proxies usually have limited functions compare to VPNs.
     // Anonymity: High
-    public const PROXY_PUB = 'PUB';
+    public const string PROXY_PUB = 'PUB';
 
     // Web Proxies. These are web services which make web requests on a user's behalf. These differ from VPNs or Public Proxies in that they are simple
     // web-based proxies rather than operating at the IP address and other ports level.
     // Anonymity: High
-    public const PROXY_WEB = 'WEB';
+    public const string PROXY_WEB = 'WEB';
 
     // Search Engine Robots. These are services which perform crawling or scraping to a website, such as, the search engine spider or bots engine.
     // Anonymity: Low
-    public const PROXY_SES = 'SES';
+    public const string PROXY_SES = 'SES';
+
+    // Opened on first use, per instance (not a method-level static: that was shared by every instance,
+    // so a second instance with another baseDir silently read the first one's databases)
+    private ?Database $countryDb = null;
+    private ?Database $proxyTypeDb = null;
 
     public function __construct(
         private readonly string $baseDir = '/usr/share/GeoIP/',
@@ -88,30 +93,18 @@ class Ip2LocationGeoIp
     /** @throws Throwable */
     private function getCountryDatabase(): Database
     {
-        static $db = null;
-
-        if ($db === null) {
-            $db = new Database(
-                file: rtrim($this->baseDir, '/') . '/' . ltrim($this->ip2locationCountryFilename, '/'),
-                mode: Database::MEMORY_CACHE,
-            );
-        }
-
-        return $db;
+        return $this->countryDb ??= new Database(
+            file: rtrim($this->baseDir, '/') . '/' . ltrim($this->ip2locationCountryFilename, '/'),
+            mode: Database::MEMORY_CACHE,
+        );
     }
 
     /** @throws Throwable */
     private function getProxyTypeDatabase(): Database
     {
-        static $db = null;
-
-        if ($db === null) {
-            $db = new Database(
-                file: rtrim($this->baseDir, '/') . '/' . ltrim($this->ip2locationProxyTypeFilename, '/'),
-                mode: Database::MEMORY_CACHE,
-            );
-        }
-
-        return $db;
+        return $this->proxyTypeDb ??= new Database(
+            file: rtrim($this->baseDir, '/') . '/' . ltrim($this->ip2locationProxyTypeFilename, '/'),
+            mode: Database::MEMORY_CACHE,
+        );
     }
 }

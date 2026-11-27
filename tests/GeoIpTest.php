@@ -14,8 +14,10 @@ class GeoIpTest extends TestCase
     use ProphecyTrait;
 
     private GeoIp $geoIp;
-    private Ip2LocationGeoIp|ObjectProphecy $ip2LocationGeoIp;
-    private MaxMindGeoIp|ObjectProphecy $maxMindGeoIp;
+    /** @var ObjectProphecy<Ip2LocationGeoIp> */
+    private ObjectProphecy $ip2LocationGeoIp;
+    /** @var ObjectProphecy<MaxMindGeoIp> */
+    private ObjectProphecy $maxMindGeoIp;
 
     public function setUp(): void
     {

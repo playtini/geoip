@@ -21,6 +21,18 @@ We're hiring marketers (FB, Tiktok, UAC, in-app, Google) and developers (PHP, JS
 composer require playtini/geoip
 ```
 
+Requires PHP 8.5+ (1.x supports PHP 8.1+).
+
+### Upgrading to 2.0
+
+- PHP `^8.5`.
+- `symfony/http-client` and `symfony/http-foundation` are no longer required: the library never used them.
+  Require them yourself if your code relied on them coming in through this package.
+- Each `MaxMindGeoIp` / `Ip2LocationGeoIp` instance opens its own databases. In 1.x they were cached in method-level
+  statics shared by all instances, so a second instance with another `baseDir` read the first one's files.
+- `city()` and `asn()` return what the databases hold: `accuracy_radius` and `num` are ints, `latitude` and
+  `longitude` floats (empty strings when unknown, as before); only the docblock types changed.
+
 ## Usage
 
 See `examples/*.php`.

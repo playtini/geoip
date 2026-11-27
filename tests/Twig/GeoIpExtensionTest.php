@@ -55,4 +55,18 @@ class GeoIpExtensionTest extends TestCase
 
         $this->assertSame('<span style="display: inline-block" title="RU" class="flag flag-ru"></span><span class="invisible-report">RU</span>', $html);
     }
+
+    public function testDomainIp(): void
+    {
+        // An IP literal resolves to itself without a DNS query
+        $this->assertSame('127.0.0.1', $this->geoIpExtension->domainIp('127.0.0.1'));
+        $this->assertSame('', $this->geoIpExtension->domainIp(null));
+    }
+
+    public function testEmptyValuesGiveNoCountryAndNoFlag(): void
+    {
+        $this->assertSame('', $this->geoIpExtension->ipCountryCode(null));
+        $this->assertSame('', $this->geoIpExtension->countryCodeFlag(''));
+        $this->assertSame('', $this->geoIpExtension->countryCodeFlag(null));
+    }
 }

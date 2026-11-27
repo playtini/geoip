@@ -7,6 +7,12 @@ use Throwable;
 
 class MaxMindGeoIp
 {
+    // Opened on first use, per instance (not a method-level static: that was shared by every instance,
+    // so a second instance with another baseDir silently read the first one's databases)
+    private ?Reader $asnDb = null;
+    private ?Reader $cityDb = null;
+    private ?Reader $countryDb = null;
+
     public function __construct(
         private readonly string $baseDir = '/usr/share/GeoIP/',
         private readonly string $maxMindAsnFilename = 'GeoLite2-ASN.mmdb',
@@ -33,7 +39,11 @@ class MaxMindGeoIp
         return ($country !== 'UN' && $country !== '-') ? $country : '';
     }
 
-    /** @return array<string,string> */
+    /**
+     * Empty strings for an unknown IP; accuracy_radius is an int and latitude/longitude are floats when known.
+     *
+     * @return array<string, string|int|float>
+     */
     public function city(?string $ip): array
     {
         $record = null;
@@ -64,7 +74,7 @@ class MaxMindGeoIp
         ];
     }
 
-    /** @return array<string,string> */
+    /** @return array<string, string|int> keys org, num (int when known), net */
     public function asn(?string $ip): array
     {
         $record = null;
@@ -78,57 +88,27 @@ class MaxMindGeoIp
         }
 
         return [
-            'org' => $record?->autonomousSystemOrganization ?? '',
-            'num' => $record?->autonomousSystemNumber ?? '',
-            'net' => $record?->network ?? '',
+            'org' => $record->autonomousSystemOrganization ?? '',
+            'num' => $record->autonomousSystemNumber ?? '',
+            'net' => $record->network ?? '',
         ];
     }
 
     /** @throws Throwable */
     private function getAsnDatabase(): Reader
     {
-        static $db = null;
-
-        if ($db === null) {
-            $db = new Reader(
-                rtrim($this->baseDir, '/') .
-                '/' .
-                ltrim($this->maxMindAsnFilename, '/')
-            );
-        }
-
-        return $db;
+        return $this->asnDb ??= new Reader(rtrim($this->baseDir, '/') . '/' . ltrim($this->maxMindAsnFilename, '/'));
     }
 
     /** @throws Throwable */
     private function getCityDatabase(): Reader
     {
-        static $db = null;
-
-        if ($db === null) {
-            $db = new Reader(
-                rtrim($this->baseDir, '/') .
-                '/' .
-                ltrim($this->maxMindCityFilename, '/')
-            );
-        }
-
-        return $db;
+        return $this->cityDb ??= new Reader(rtrim($this->baseDir, '/') . '/' . ltrim($this->maxMindCityFilename, '/'));
     }
 
     /** @throws Throwable */
     private function getCountryDatabase(): Reader
     {
-        static $db = null;
-
-        if ($db === null) {
-            $db = new Reader(
-                rtrim($this->baseDir, '/') .
-                '/' .
-                ltrim($this->maxMindCountryFilename, '/')
-            );
-        }
-
-        return $db;
+        return $this->countryDb ??= new Reader(rtrim($this->baseDir, '/') . '/' . ltrim($this->maxMindCountryFilename, '/'));
     }
 }

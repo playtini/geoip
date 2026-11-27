@@ -2,11 +2,13 @@ name: test
 on:
     workflow_dispatch:
     push: {branches: ['main']}
+    pull_request:
 concurrency:
     group: ci-${{ github.ref }}-${{ github.head_ref }}
     cancel-in-progress: true
 jobs:
     test:
+        # Public dependencies only (Packagist), so a GitHub-hosted runner works here
         runs-on: ubuntu-latest
         steps:
             -   name: checkout
@@ -14,34 +16,19 @@ jobs:
                 with:
                     fetch-depth: 1
 
-            -   name: composer cache
-                uses: actions/cache@v6
+            -   uses: shivammathur/setup-php@v2
                 with:
-                    path: /tmp/composer-cache
-                    key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+                    php-version: '8.5'
+                    # bcmath: ip2location/ip2location-php requires it
+                    extensions: bcmath
+                    coverage: pcov
+                    # assert() lines run (and count as covered), as in `composer test`
+                    ini-values: zend.assertions=1
 
-            -   name: composer
-                uses: php-actions/composer@v6
-                with:
-                    dev: yes
-                    php_version: '8.3'
-                    memory_limit: 512M
-                    args: '--ignore-platform-reqs --no-ansi --no-scripts --no-progress -o'
+            -   uses: ramsey/composer-install@v3
 
-            -   name: phpunit
-                uses: php-actions/phpunit@v4
-                env:
-                    XDEBUG_MODE: coverage
-                with:
-                    version: '10.5'
-                    php_version: '8.3'
-                    configuration: phpunit.xml.dist
-                    args: '--coverage-text --coverage-clover coverage.xml -dxdebug.mode=coverage'
-                    memory_limit: '512M'
-                    php_extensions: xdebug mbstring
+            -   name: PHPStan
+                run: composer stan
 
-#            -   name: codecov
-#                uses: codecov/codecov-action@v7
-#                with:
-#                    verbose: true
-#                    files: ./coverage.xml
+            -   name: PHPUnit
+                run: vendor/bin/phpunit --coverage-text

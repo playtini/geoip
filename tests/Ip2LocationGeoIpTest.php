@@ -2,15 +2,13 @@
 
 namespace Playtini\GeoIp\Tests;
 
-use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Playtini\GeoIp\Ip2LocationGeoIp;
 
 /**
  * Runs against the IP2Location LITE DB1 sample that ip2location/ip2location-php ships in its data/ directory.
  *
- * Ip2LocationGeoIp caches each Database in a method-level static, shared by every instance in the process:
- * the first successful open wins. Tests that need a missing database therefore run in a separate process.
+ * Each instance opens its own databases (2.0: they used to be method-level statics, shared by every instance).
  */
 class Ip2LocationGeoIpTest extends TestCase
 {
@@ -50,12 +48,17 @@ class Ip2LocationGeoIpTest extends TestCase
         self::assertSame('', self::geoIp()->proxyType(null));
     }
 
-    #[RunInSeparateProcess]
     public function testMissingDatabasesGiveEmptyResults(): void
     {
         $geoIp = self::geoIp('/nonexistent');
 
         self::assertSame('', $geoIp->country('8.8.8.8'));
         self::assertSame('', $geoIp->proxyType('8.8.8.8'));
+    }
+
+    public function testInstancesDoNotShareDatabases(): void
+    {
+        self::assertSame('US', self::geoIp()->country('8.8.8.8'));
+        self::assertSame('', self::geoIp('/nonexistent')->country('8.8.8.8'));
     }
 }

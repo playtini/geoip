@@ -11,6 +11,7 @@ class GeoIp
     {
     }
 
+    /** @param list<string> $preferredCountries */
     public function country(?string $ip, array $preferredCountries = []): string
     {
         $country = $this->ip2LocationCountry($ip);
@@ -37,6 +38,10 @@ class GeoIp
         return ($country !== '') ? $country : $country2;
     }
 
+    /**
+     * @param list<string> $preferredCountries
+     * @return array<string, string|int|float>
+     */
     public function city(?string $ip, array $preferredCountries = []): array
     {
         $a = $this->maxMindCity($ip);
@@ -65,13 +70,13 @@ class GeoIp
         return $this->maxMindGeoIp->country($ip);
     }
 
-    /** @return array<string,string> */
+    /** @return array<string, string|int|float> */
     public function maxMindCity(?string $ip): array
     {
         return $this->maxMindGeoIp->city($ip);
     }
 
-    /** @return array<string,string> */
+    /** @return array<string, string|int> keys org, num (int when known), net */
     public function maxMindAsn(?string $ip): array
     {
         return $this->maxMindGeoIp->asn($ip);

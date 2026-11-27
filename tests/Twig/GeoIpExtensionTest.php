@@ -1,6 +1,6 @@
 <?php
 
-namespace Playtini\Tests\GeoIp\Twig;
+namespace Playtini\GeoIp\Tests\Twig;
 
 use PHPUnit\Framework\TestCase;
 use Playtini\GeoIp\GeoIp;
@@ -13,7 +13,8 @@ class GeoIpExtensionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private GeoIp|ObjectProphecy $geoIp;
+    /** @var ObjectProphecy<GeoIp> */
+    private ObjectProphecy $geoIp;
 
     private GeoIpExtension $geoIpExtension;
 
@@ -27,8 +28,10 @@ class GeoIpExtensionTest extends TestCase
     {
         $filters = $this->geoIpExtension->getFilters();
 
-        $this->assertIsArray($filters);
-        $this->assertInstanceOf(TwigFilter::class, $filters[0]);
+        $this->assertSame(
+            ['domain_ip', 'ip_country_code', 'ip_flag', 'country_code_flag'],
+            array_map(static fn (TwigFilter $filter): string => $filter->getName(), $filters),
+        );
     }
 
     public function testCountryCodeFlag(): void

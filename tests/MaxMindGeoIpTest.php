@@ -2,15 +2,13 @@
 
 namespace Playtini\GeoIp\Tests;
 
-use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Playtini\GeoIp\MaxMindGeoIp;
 
 /**
  * Runs against MaxMind's official test databases (tests/Fixtures/geoip, from github.com/maxmind/MaxMind-DB).
  *
- * MaxMindGeoIp caches each Reader in a method-level static, shared by every instance in the process: the first
- * successful open wins. Tests that need a missing database therefore run in a separate process.
+ * Each instance opens its own databases (2.0: they used to be method-level statics, shared by every instance).
  */
 class MaxMindGeoIpTest extends TestCase
 {
@@ -93,7 +91,6 @@ class MaxMindGeoIpTest extends TestCase
         self::assertSame(['org' => '', 'num' => '', 'net' => ''], self::geoIp()->asn(null));
     }
 
-    #[RunInSeparateProcess]
     public function testMissingDatabasesGiveEmptyResults(): void
     {
         $geoIp = self::geoIp('/nonexistent');
@@ -101,5 +98,11 @@ class MaxMindGeoIpTest extends TestCase
         self::assertSame('', $geoIp->country('2.125.160.216'));
         self::assertSame('', $geoIp->city('2.125.160.216')['country']);
         self::assertSame(['org' => '', 'num' => '', 'net' => ''], $geoIp->asn('1.128.0.0'));
+    }
+
+    public function testInstancesDoNotShareDatabases(): void
+    {
+        self::assertSame('GB', self::geoIp()->country('2.125.160.216'));
+        self::assertSame('', self::geoIp('/nonexistent')->country('2.125.160.216'));
     }
 }
